@@ -1,4 +1,4 @@
-package org.geoframe.brokergeo.data;
+package org.geoframe.brokergeo.core.state;
 
 import oms3.annotations.Description;
 import oms3.annotations.Unit;

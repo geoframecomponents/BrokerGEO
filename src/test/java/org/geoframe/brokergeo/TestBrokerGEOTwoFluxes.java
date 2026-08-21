@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.geoframe.brokergeo;
-import org.geoframe.brokergeo.solver.*;
-import org.geoframe.brokergeo.data.*;
+import org.geoframe.brokergeo.solvers.*;
+import org.geoframe.brokergeo.core.state.*;
 import org.hortonmachine.gears.io.geoframe.ReadNetCDFRichardsLysimeterGrid1D;
 /**
  * Test the Broker module.
@@ -31,7 +31,7 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 
 		String pathGrid = getRes("/Input/Grid_NetCDF/GridLysRoot.nc");
 		
-		InputData inputData = new InputData();
+		CurrentStepInput inputData = new CurrentStepInput();
 		ProblemQuantities problemQuantities = new ProblemQuantities();
 		
 		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();

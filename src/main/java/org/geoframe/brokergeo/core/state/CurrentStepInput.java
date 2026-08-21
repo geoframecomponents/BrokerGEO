@@ -1,10 +1,10 @@
-package org.geoframe.brokergeo.data;
+package org.geoframe.brokergeo.core.state;
 
 
 import oms3.annotations.Description;
 import oms3.annotations.Unit;
 
-public class InputData {
+public class CurrentStepInput {
 	
 	@Description("Depth of the root.")
 	@Unit("m")

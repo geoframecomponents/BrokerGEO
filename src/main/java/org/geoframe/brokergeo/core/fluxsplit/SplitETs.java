@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.methods;
+package org.geoframe.brokergeo.core.fluxsplit;
 
-import org.geoframe.brokergeo.data.InputData;
-import org.geoframe.brokergeo.data.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.CurrentStepInput;
+import org.geoframe.brokergeo.core.state.ProblemQuantities;
 
 /**
  * The stressedETs abstract class.
@@ -30,9 +30,9 @@ import org.geoframe.brokergeo.data.ProblemQuantities;
 public abstract class SplitETs {
 
 	public ProblemQuantities variables;
-	public InputData input;
+	public CurrentStepInput input;
 
-	public SplitETs(ProblemQuantities variables, InputData input) {
+	public SplitETs(ProblemQuantities variables, CurrentStepInput input) {
 		this.variables = variables;
 		this.input = input;
 	}

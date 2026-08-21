@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.solver;
+package org.geoframe.brokergeo.solvers;
 
-import org.geoframe.brokergeo.methods.*;
+import org.geoframe.brokergeo.core.fluxsplit.*;
 import org.hortonmachine.gears.libs.modules.HMModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.geoframe.brokergeo.data.*;
+import org.geoframe.brokergeo.core.state.*;
 import oms3.annotations.Author;
 import oms3.annotations.Description;
 import oms3.annotations.Documentation;
@@ -81,7 +81,7 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 	private SplitETs computedEs;
 
 	public ProblemQuantities variables;
-	public InputData input;
+	public CurrentStepInput input;
 
 	@Execute
 	public void solve() {

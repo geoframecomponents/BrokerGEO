@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.methods;
+package org.geoframe.brokergeo.core.fluxsplit;
 
 import static java.lang.Math.pow;
 
-import org.geoframe.brokergeo.data.InputData;
-import org.geoframe.brokergeo.data.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.CurrentStepInput;
+import org.geoframe.brokergeo.core.state.ProblemQuantities;
 
 /**
  * Computation of the Transpiration from each control volumes as function of
@@ -31,14 +31,14 @@ import org.geoframe.brokergeo.data.ProblemQuantities;
  */
 public class RootWaterWeightedMethod extends SplitETs {
 
-	public RootWaterWeightedMethod(ProblemQuantities variables, InputData input) {
+	public RootWaterWeightedMethod(ProblemQuantities variables, CurrentStepInput input) {
 		super(variables, input);
 	}
 
 	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
 
 		// variables = ProblemQuantities.getInstance();
-		// input = InputData.getInstance();
+		// input = CurrentStepInput.getInstance();
 		variables.control = 0;
 		variables.sumRootWaterStress = 0;
 

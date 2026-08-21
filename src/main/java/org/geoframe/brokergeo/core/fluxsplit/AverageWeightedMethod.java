@@ -16,63 +16,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.methods;
+package org.geoframe.brokergeo.core.fluxsplit;
 
 import static java.lang.Math.pow;
 
-import org.geoframe.brokergeo.data.InputData;
-import org.geoframe.brokergeo.data.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.*;
 
 /**
- * Computation of the Transpiration from each control volumes as function of
- * root distribution
+ * Computation of Transpirations and Evapotranspirations from control volumes by
+ * using stress factor avarage method
  * 
  * @author Concetta D'Amato
  */
-public class RootWeightedMethod extends SplitETs {
 
-	public RootWeightedMethod(ProblemQuantities variables, InputData input) {
+public class AverageWeightedMethod extends SplitETs {
+
+	public AverageWeightedMethod(ProblemQuantities variables, CurrentStepInput input) {
 		super(variables, input);
 	}
 
 	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
 
 		// variables = ProblemQuantities.getInstance();
-		// input = InputData.getInstance();
+		// input = CurrentStepInput.getInstance();
 		variables.control = 0;
-		variables.sumRootDensity = 0;
+		variables.N = 0;
 
+		// if (input.etaRef == 0.0) {variables.zRef = 0;}
+		// variables.N = variables.NUM_CONTROL_VOLUMES-2;} // NON SONO SICURA SU QUESTO
+		// CICLO IF
+		// else
 		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
-			if (input.z[i] >= zRef) {
-				variables.sumRootDensity = variables.sumRootDensity + input.rootDensity[i];
+			if (input.z[i] > zRef) {
+				variables.N = variables.N + 1;
 			}
-			// variables.sumRootWaterStress = variables.sumRootWaterStress +
-			// (input.rootIC[i]*input.g[i]);
-		}
-
-		if (input.evapotranspiration != 0 && input.etaR == 0.0) {
-			System.out.println("\n\nError: Please enter the root depth.\nSimulation ended");
-			System.exit(0);
 		}
 
 		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
 
 			if (input.z[i] >= zRef) {
-				variables.fluxRefs[i] = (fluxRef * (input.rootDensity[i] / variables.sumRootDensity));
+				variables.fluxRefs[i] = fluxRef / variables.N;
 			} else {
 				variables.fluxRefs[i] = 0;
 			}
-			variables.control = variables.control + variables.fluxRefs[i];
 
+			variables.control = variables.control + variables.fluxRefs[i];
 		}
 
 		// if (variables.control == fluxRef) { System.out.println("\n\nControllo su
-		// fluxs Root corretto");}
+		// fluxs Average corretto");}
+
 		// if (variables.control < fluxRef + 1 * pow(10,-8) || variables.control >
-		// fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Root
-		// corretto");}
+		// fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs
+		// Average corretto");}
 		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
-			System.out.println("\n\nControllo su fluxs Root corretto\"");
+			System.out.println("\n\nControllo su fluxs Average corretto\"");
 		} else {
 			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
 		}

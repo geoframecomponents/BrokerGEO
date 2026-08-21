@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.methods;
+package org.geoframe.brokergeo.core.fluxsplit;
 
-import org.geoframe.brokergeo.data.InputData;
-import org.geoframe.brokergeo.data.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.CurrentStepInput;
+import org.geoframe.brokergeo.core.state.ProblemQuantities;
 
 /**
  * A simple design factory for creating a StressedETs objects
@@ -32,9 +32,9 @@ public class SplitETsFactory {
 	 * 
 	 * @param type                name of the Evaporation or Transpiration splitting
 	 * @param variables           the ProblemQuantities object
-	 * @param input               the InputData object
+	 * @param input               the CurrentStepInput object
 	 */
-	public static SplitETs createEvapoTranspirations(String type, ProblemQuantities variables, InputData input) {
+	public static SplitETs createEvapoTranspirations(String type, ProblemQuantities variables, CurrentStepInput input) {
 
 		SplitETs splitETs = null;
 		if (type.equalsIgnoreCase("AverageWaterWeightedMethod")) {

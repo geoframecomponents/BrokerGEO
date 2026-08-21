@@ -16,63 +16,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.geoframe.brokergeo.methods;
+package org.geoframe.brokergeo.core.fluxsplit;
 
 import static java.lang.Math.pow;
 
-import org.geoframe.brokergeo.data.*;
+import org.geoframe.brokergeo.core.state.CurrentStepInput;
+import org.geoframe.brokergeo.core.state.ProblemQuantities;
 
 /**
- * Computation of Transpirations and Evapotranspirations from control volumes by
- * using stress factor avarage method
+ * Computation of the Transpirations and Evapotranspirations by using stress
+ * factor size wighted metohd
  * 
  * @author Concetta D'Amato
  */
+public class SizeWeightedMethod extends SplitETs {
 
-public class AverageWaterWeightedMethod extends SplitETs {
-
-	public AverageWaterWeightedMethod(ProblemQuantities variables, InputData input) {
+	public SizeWeightedMethod(ProblemQuantities variables, CurrentStepInput input) {
 		super(variables, input);
 	}
 
 	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
 
-		// variables = ProblemQuantities.getInstance();
-		// input = InputData.getInstance();
 		variables.control = 0;
+		variables.etaRef = 0;
+		variables.etaRef = Math.floor((variables.totalDepth - zRef) * 100) / 100;
 
 		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
 
-			if (Gn[0] == 0) {
-				variables.fluxRefs[i] = 0;
+			if (input.z[i] >= zRef) {
+				variables.fluxRefs[i] = (fluxRef * input.deltaZ[i]) / (variables.etaRef);
 			} else {
-				if (input.z[i] > zRef) {
-					variables.fluxRefs[i] = fluxRef / Gn[1] * (input.g[i] / Gn[0]);
-				} else {
-					variables.fluxRefs[i] = 0;
-				}
+				variables.fluxRefs[i] = 0;
 			}
+
 			variables.control = variables.control + variables.fluxRefs[i];
 		}
 
-		// if (variables.control == fluxRef) { System.out.println("\n\nControllo su
-		// fluxs Average corretto");}
-
-		// if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef
-		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Average
+		// if (variables.control < fluxRef + 1 * pow(10,-8) || variables.control >
+		// fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Size
 		// corretto");}
-
 		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
-			System.out.println("\n\nControllo su fluxs Average corretto\"");
+			System.out.println("\n\nControllo su fluxs Size corretto\"");
 		} else {
 			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
 		}
 
 		return variables.fluxRefs.clone();
 	}
-
-	/*
-	 * public double [] computeETs() { return null; }
-	 */
-
 }
