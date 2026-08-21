@@ -49,9 +49,6 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 		etsBrokerSolver.input = inputData;
 		etsBrokerSolver.variables = problemQuantities;
 
-		InputDataMain Input = new InputDataMain();
-		Input.input = inputData;
-
 		readNetCDF.richardsGridFilename = pathGrid;
 
 		readNetCDF.read();
@@ -60,17 +57,15 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 																			// RootWaterWeightedMethod
 		// AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
 
-		Input.z = readNetCDF.z;
-		Input.etaR = etaR;
-		Input.deltaZ = readNetCDF.spaceDelta;
-		Input.transpiration = transpiration;
-		Input.rootDensity = rootDensity;
-		Input.g = g;
-		Input.GnT = GnT;
+		inputData.z = readNetCDF.z;
+		inputData.etaR = etaR;
+		inputData.deltaZ = readNetCDF.spaceDelta;
+		inputData.transpiration = transpiration;
+		inputData.rootDensity = rootDensity;
+		inputData.g = g;
+		inputData.GnT = GnT;
 
 		etsBrokerSolver.useWaterStress = false;// false, when you use simple methods
-
-		Input.process();
 
 		etsBrokerSolver.solve();
 

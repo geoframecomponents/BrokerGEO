@@ -46,29 +46,26 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 		ETsBrokerTwoFluxesSolverMain etsBrokerSolver = new ETsBrokerTwoFluxesSolverMain();
 		etsBrokerSolver.input = inputData;
 		etsBrokerSolver.variables = problemQuantities;
-		InputDataMain Input = new InputDataMain();
-		Input.input = inputData;
-		
+
 		readNetCDF.richardsGridFilename = pathGrid;
-		
+
 		readNetCDF.read();
 
-		Input.z = readNetCDF.z;
-		Input.etaR = -0.8;
-		Input.etaE = -0.8;
-		Input.deltaZ = readNetCDF.spaceDelta;
-		Input.transpiration = transpiration;
-		Input.evaporation = evaporation;
+		inputData.z = readNetCDF.z;
+		inputData.etaR = -0.8;
+		inputData.etaE = -0.8;
+		inputData.deltaZ = readNetCDF.spaceDelta;
+		inputData.transpiration = transpiration;
+		inputData.evaporation = evaporation;
 		etsBrokerSolver.representativeEsModel = "AverageWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod
 		etsBrokerSolver.representativeTsModel = "RootWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod, RootWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
-		Input.rootDensity = rootDensity;
+		inputData.rootDensity = rootDensity;
 		etsBrokerSolver.useWaterStress = false; //false, when you use simple methods
-		Input.g = g;
-		
-		Input.GnT = GnT;
-		Input.GnE = GnE;
+		inputData.g = g;
 
-		Input.process();
+		inputData.GnT = GnT;
+		inputData.GnE = GnE;
+
 		etsBrokerSolver.solve();
 
 		assertGoldenArray("StressedETs", etsBrokerSolver.StressedETs);
