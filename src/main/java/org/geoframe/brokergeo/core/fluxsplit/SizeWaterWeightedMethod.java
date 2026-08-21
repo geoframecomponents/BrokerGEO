@@ -31,11 +31,8 @@ import org.geoframe.brokergeo.core.state.ProblemQuantities;
  */
 public class SizeWaterWeightedMethod extends SplitETs {
 
-	public SizeWaterWeightedMethod(ProblemQuantities variables, CurrentStepInput input) {
-		super(variables, input);
-	}
-
-	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
+	public double[] computeStressedETs(ProblemQuantities variables, CurrentStepInput input, double[] Gn,
+			double fluxRef, double zRef) {
 
 		// variables = ProblemQuantities.getInstance();
 		// input = CurrentStepInput.getInstance();

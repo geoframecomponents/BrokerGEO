@@ -4,6 +4,8 @@ package org.geoframe.brokergeo.core.state;
 import oms3.annotations.Description;
 import oms3.annotations.Unit;
 
+import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
+
 public class CurrentStepInput {
 	
 	@Description("Depth of the root.")
@@ -34,28 +36,17 @@ public class CurrentStepInput {
 	@Unit("m")
 	public double[] deltaZ;
 	
-	@Description("Evaporation from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod"
-		    + " SizeWaterWeightedMetod, SizeWeightedMethod")
-	public String representativeEsModel;
-	
-	@Description("Transpiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod"
-		    + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
-	public String representativeTsModel;
-	
-	@Description("EvapoTranspiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod"
-		    + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
-	public String representativeETsModel;
+	@Description("Evaporation from each control volume can be evaluated in different way")
+	public FluxSplitMethod representativeEsModel;
 
-	@Description("The generic flux from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod"
-		    + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
-	public String representativeModel;
+	@Description("Transpiration from each control volume can be evaluated in different way")
+	public FluxSplitMethod representativeTsModel;
+
+	@Description("EvapoTranspiration from each control volume can be evaluated in different way")
+	public FluxSplitMethod representativeETsModel;
+
+	@Description("The generic flux from each control volume can be evaluated in different way")
+	public FluxSplitMethod representativeModel;
 	
 	
 	@Description("Vector of root density")

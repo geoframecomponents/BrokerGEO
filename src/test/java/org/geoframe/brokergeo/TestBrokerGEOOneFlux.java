@@ -20,6 +20,7 @@ package org.geoframe.brokergeo;
 
 import org.geoframe.brokergeo.solvers.*;
 import org.geoframe.brokergeo.core.state.*;
+import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
 import org.hortonmachine.gears.io.geoframe.ReadNetCDFRichardsLysimeterGrid1D;
 
 /**
@@ -52,10 +53,7 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 		readNetCDF.richardsGridFilename = pathGrid;
 
 		readNetCDF.read();
-		etsBrokerSolver.representativeTsModel = "AverageWeightedMethod"; // AverageWaterWeightedMethod,
-																			// SizeWaterWeightedMetod,
-																			// RootWaterWeightedMethod
-		// AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
+		etsBrokerSolver.representativeTsModel = FluxSplitMethod.AVERAGE_WEIGHTED;
 
 		inputData.z = readNetCDF.z;
 		inputData.etaR = etaR;

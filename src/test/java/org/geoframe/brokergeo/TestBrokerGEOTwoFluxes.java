@@ -19,6 +19,7 @@
 package org.geoframe.brokergeo;
 import org.geoframe.brokergeo.solvers.*;
 import org.geoframe.brokergeo.core.state.*;
+import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
 import org.hortonmachine.gears.io.geoframe.ReadNetCDFRichardsLysimeterGrid1D;
 /**
  * Test the Broker module.
@@ -57,8 +58,8 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 		inputData.deltaZ = readNetCDF.spaceDelta;
 		inputData.transpiration = transpiration;
 		inputData.evaporation = evaporation;
-		etsBrokerSolver.representativeEsModel = "AverageWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod
-		etsBrokerSolver.representativeTsModel = "RootWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod, RootWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
+		etsBrokerSolver.representativeEsModel = FluxSplitMethod.AVERAGE_WEIGHTED;
+		etsBrokerSolver.representativeTsModel = FluxSplitMethod.ROOT_WEIGHTED;
 		inputData.rootDensity = rootDensity;
 		etsBrokerSolver.useWaterStress = false; //false, when you use simple methods
 		inputData.g = g;

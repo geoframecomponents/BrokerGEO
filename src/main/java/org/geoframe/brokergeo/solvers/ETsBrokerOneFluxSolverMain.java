@@ -47,11 +47,9 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 	@In
 	public boolean useWaterStress = true;
 
-	@Description("Transpiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
+	@Description("Transpiration from each control volume can be evaluated in different way")
 	@In
-	public String representativeTsModel;
+	public FluxSplitMethod representativeTsModel;
 
 	@Description("ArrayList of variable to be stored in the buffer writer")
 	@Out
@@ -76,7 +74,7 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 			variables.StressedETs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 			variables.fluxRefs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 
-			computedTs = SplitETsFactory.createEvapoTranspirations(input.representativeTsModel, variables, input);
+			computedTs = input.representativeTsModel.newInstance();
 
 			outputToBuffer = new ArrayList<double[]>();
 
@@ -84,22 +82,15 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 
 		variables.zR = variables.totalDepth + input.etaR;
 
-		if (input.representativeTsModel.equalsIgnoreCase("AverageWaterWeightedMethod") && useWaterStress == false) {
-			System.out.print(
-					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
-		}
-		if (input.representativeTsModel.equalsIgnoreCase("SizeWaterWeightedMethod") && useWaterStress == false) {
-			System.out.print(
-					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
-		}
-		if (input.representativeTsModel.equalsIgnoreCase("RootWaterWeightedMethod") && useWaterStress == false) {
+		if (input.representativeTsModel.isWaterWeighted() && !useWaterStress) {
 			System.out.print(
 					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
 		}
 
 		outputToBuffer.clear();
 
-		variables.StressedETs = computedTs.computeStressedETs(input.GnT, input.transpiration, variables.zR);
+		variables.StressedETs = computedTs.computeStressedETs(variables, input, input.GnT, input.transpiration,
+				variables.zR);
 
 		stressedETs = variables.StressedETs;
 		outputToBuffer.add(variables.StressedETs);

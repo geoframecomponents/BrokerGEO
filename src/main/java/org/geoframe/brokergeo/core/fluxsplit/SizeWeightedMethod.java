@@ -31,11 +31,8 @@ import org.geoframe.brokergeo.core.state.ProblemQuantities;
  */
 public class SizeWeightedMethod extends SplitETs {
 
-	public SizeWeightedMethod(ProblemQuantities variables, CurrentStepInput input) {
-		super(variables, input);
-	}
-
-	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
+	public double[] computeStressedETs(ProblemQuantities variables, CurrentStepInput input, double[] Gn,
+			double fluxRef, double zRef) {
 
 		variables.control = 0;
 		variables.etaRef = 0;

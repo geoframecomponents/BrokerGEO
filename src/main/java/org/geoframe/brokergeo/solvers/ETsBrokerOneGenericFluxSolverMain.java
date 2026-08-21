@@ -48,11 +48,9 @@ public class ETsBrokerOneGenericFluxSolverMain extends HMModel {
 	@In
 	public boolean useWaterStress = true;
 
-	@Description("The generic flux from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
+	@Description("The generic flux from each control volume can be evaluated in different way")
 	@In
-	public String representativeModel;
+	public FluxSplitMethod representativeModel;
 
 	@Description("ArrayList of variable to be stored in the buffer writer")
 	@Out
@@ -74,7 +72,7 @@ public class ETsBrokerOneGenericFluxSolverMain extends HMModel {
 			variables.StressedETs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 			variables.fluxRefs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 
-			computedFluxs = SplitETsFactory.createEvapoTranspirations(input.representativeModel, variables, input);
+			computedFluxs = input.representativeModel.newInstance();
 
 			outputToBuffer = new ArrayList<double[]>();
 
@@ -82,22 +80,15 @@ public class ETsBrokerOneGenericFluxSolverMain extends HMModel {
 
 		variables.zRef = variables.totalDepth + input.etaRef;
 
-		if (useWaterStress == false) {
-			if (input.representativeModel.equalsIgnoreCase("AverageWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is split according the water stress factor, but evapotranspiration is not water stressed");
-			} else if (input.representativeModel.equalsIgnoreCase("SizeWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is split according the water stress factor, but evapotranspiration is not water stressed");
-			} else if (input.representativeModel.equalsIgnoreCase("RootWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
-			}
+		if (!useWaterStress && input.representativeModel.isWaterWeighted()) {
+			pm.errorMessage(
+					"WARNING: the flux is split according the water stress factor, but evapotranspiration is not water stressed");
 		}
 
 		outputToBuffer.clear();
 
-		variables.StressedETs = computedFluxs.computeStressedETs(input.Gn, input.flux, variables.zRef);
+		variables.StressedETs = computedFluxs.computeStressedETs(variables, input, input.Gn, input.flux,
+				variables.zRef);
 
 		StressedETs = variables.StressedETs;
 

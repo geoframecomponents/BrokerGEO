@@ -23,29 +23,22 @@ import org.geoframe.brokergeo.core.state.ProblemQuantities;
 
 /**
  * The stressedETs abstract class.
- * 
+ *
  * @author Concetta D'Amato
  */
 
 public abstract class SplitETs {
 
-	public ProblemQuantities variables;
-	public CurrentStepInput input;
-
-	public SplitETs(ProblemQuantities variables, CurrentStepInput input) {
-		this.variables = variables;
-		this.input = input;
-	}
-
 	/**
 	 * This method compute the evaporation and transpiration in each control volumes
 	 * of the whole column of soil given the total evaporation and transpiration
 	 * from the Evapotranspiration Component
-	 * 
-	 * @param Gn, @param fluxRef, @param zRef
+	 *
+	 * @param variables, @param input, @param Gn, @param fluxRef, @param zRef
 	 *
 	 * @return fluxRefs
 	 */
-	public abstract double[] computeStressedETs(double[] Gn, double fluxRef, double zRef);
+	public abstract double[] computeStressedETs(ProblemQuantities variables, CurrentStepInput input, double[] Gn,
+			double fluxRef, double zRef);
 
 }

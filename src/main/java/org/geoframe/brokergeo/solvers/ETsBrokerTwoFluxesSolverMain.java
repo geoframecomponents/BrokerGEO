@@ -59,16 +59,13 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 	@In
 	public boolean useWaterStress = true;
 
-	@Description("Evaporation from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod")
+	@Description("Evaporation from each control volume can be evaluated in different way")
 	@In
-	public String representativeEsModel;
+	public FluxSplitMethod representativeEsModel;
 
-	@Description("Transpiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
+	@Description("Transpiration from each control volume can be evaluated in different way")
 	@In
-	public String representativeTsModel;
+	public FluxSplitMethod representativeTsModel;
 
 	@Description("ArrayList of variable to be stored in the buffer writer")
 	@Out
@@ -95,9 +92,9 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 			variables.StressedETs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 			variables.fluxRefs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 
-			computedEs = SplitETsFactory.createEvapoTranspirations(input.representativeEsModel, variables, input);
+			computedEs = input.representativeEsModel.newInstance();
 
-			computedTs = SplitETsFactory.createEvapoTranspirations(input.representativeTsModel, variables, input);
+			computedTs = input.representativeTsModel.newInstance();
 
 			variables.zE = variables.totalDepth + input.etaE;
 
@@ -107,28 +104,12 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 
 		variables.zR = variables.totalDepth + input.etaR;
 
-		if (useWaterStress == false) {
-			if (input.representativeTsModel.equalsIgnoreCase("AverageWaterWeightedMethod")) {
+		if (!useWaterStress) {
+			if (input.representativeTsModel.isWaterWeighted()) {
 				pm.errorMessage(
 						"WARNING: the flux is splitted according the water stress factor, but transpiration is not water stressed");
 			}
-			if (input.representativeTsModel.equalsIgnoreCase("SizeWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is splitted according the water stress factor, but transpiration is not water stressed");
-			}
-			if (input.representativeTsModel.equalsIgnoreCase("RootWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is splitted according the water stress factor, but transpiration is not water stressed");
-			}
-			if (input.representativeEsModel.equalsIgnoreCase("AverageWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is splitted according the water stress factor, but evaporation is not water stressed");
-			}
-			if (input.representativeEsModel.equalsIgnoreCase("SizeWaterWeightedMethod")) {
-				pm.errorMessage(
-						"WARNING: the flux is splitted according the water stress factor, but evaporation is not water stressed");
-			}
-			if (input.representativeEsModel.equalsIgnoreCase("RootWaterWeightedMethod")) {
+			if (input.representativeEsModel.isWaterWeighted()) {
 				pm.errorMessage(
 						"WARNING: the flux is splitted according the water stress factor, but evaporation is not water stressed");
 			}
@@ -136,8 +117,10 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 
 		outputToBuffer.clear();
 
-		variables.transpirations = computedTs.computeStressedETs(input.GnT, input.transpiration, variables.zR);
-		variables.evaporations = computedEs.computeStressedETs(input.GnE, input.evaporation, variables.zE);
+		variables.transpirations = computedTs.computeStressedETs(variables, input, input.GnT, input.transpiration,
+				variables.zR);
+		variables.evaporations = computedEs.computeStressedETs(variables, input, input.GnE, input.evaporation,
+				variables.zE);
 
 		for (int i = 0; i <= variables.transpirations.length - 1; i = i + 1) {
 			variables.StressedETs[i] = variables.evaporations[i] + variables.transpirations[i];

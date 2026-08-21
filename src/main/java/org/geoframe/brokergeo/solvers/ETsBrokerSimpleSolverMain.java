@@ -62,11 +62,9 @@ public class ETsBrokerSimpleSolverMain extends HMModel {
 	@Unit("mm/s")
 	public double[] evapotranspirations;
 
-	@Description("EvapoTranspiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod"
-			+ " RootWaterWeightedMethod, RootWeightedMethod")
+	@Description("EvapoTranspiration from each control volume can be evaluated in different way")
 	@In
-	public String representativeETsModel;
+	public FluxSplitMethod representativeETsModel;
 
 	public double[] Gn = { 0, 0 };
 
@@ -94,7 +92,7 @@ public class ETsBrokerSimpleSolverMain extends HMModel {
 			variables.evapotranspirations = new double[variables.NUM_CONTROL_VOLUMES - 1];
 			variables.fluxRefs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 
-			computedFluxs = SplitETsFactory.createEvapoTranspirations(input.representativeETsModel, variables, input);
+			computedFluxs = input.representativeETsModel.newInstance();
 
 			if (input.etaRef == 0.0) {
 				variables.zRef = 0;
@@ -103,7 +101,8 @@ public class ETsBrokerSimpleSolverMain extends HMModel {
 
 		}
 
-		variables.evapotranspirations = computedFluxs.computeStressedETs(Gn, input.evapotranspiration, variables.zRef);
+		variables.evapotranspirations = computedFluxs.computeStressedETs(variables, input, Gn,
+				input.evapotranspiration, variables.zRef);
 
 		evapotranspirations = variables.evapotranspirations;
 
