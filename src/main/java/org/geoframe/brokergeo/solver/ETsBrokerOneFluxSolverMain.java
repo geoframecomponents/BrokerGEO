@@ -17,7 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.geoframe.brokergeo.solver;
+
 import org.geoframe.brokergeo.methods.*;
+import org.hortonmachine.gears.libs.modules.HMModel;
+
 import java.util.ArrayList;
 import org.geoframe.brokergeo.data.*;
 import oms3.annotations.Author;
@@ -31,95 +34,83 @@ import oms3.annotations.Unit;
 @Description("This class is used to connect the Richard model with the evapotranspiration model, calculating the evapotranspiration for each control volume.")
 @Documentation("")
 @Author(name = "Concetta D'Amato", contact = "concetta.damato@unitn.it")
+public class ETsBrokerOneFluxSolverMain extends HMModel {
 
-
-public class ETsBrokerOneFluxSolverMain {
-	
-
-	
 	@Description("It is needed to iterate on the date")
 	int step;
-	
+
 	@Description("The stressed Evapotranspiration for each control volume")
 	@Out
 	@Unit("mm/s")
-	public double[] StressedETs;
-	
+	public double[] stressedETs;
+
 	@In
 	public boolean useWaterStress = true;
-	
+
 	@Description("Transpiration from each control volume can be evaluated in different way"
-			+ " AverageWaterWeightedMethod, AverageWeightedMethod"
-		    + " SizeWaterWeightedMetod, SizeWeightedMethod"
+			+ " AverageWaterWeightedMethod, AverageWeightedMethod" + " SizeWaterWeightedMetod, SizeWeightedMethod"
 			+ " RootWaterWeightedMethod, RootWeightedMethod")
 	@In
 	public String representativeTsModel;
-	
+
 	@Description("ArrayList of variable to be stored in the buffer writer")
 	@Out
 	public ArrayList<double[]> outputToBuffer;
-	
-	@In
-	public boolean  doProcess7;
-	@Out
-	public boolean  doProcess8;
-	
+
 	/////////////////////////////////////////////////////////////////////////////
-	
 
 	@Description("Object dealing with transpiration from each control volume of the domain")
-	SplittedETs computedTs;
-	
-	
-	private ProblemQuantities variables;
-	private InputData input;
+	SplitETs computedTs;
+
+	public ProblemQuantities variables;
+	public InputData input;
 
 	@Execute
 	public void solve() {
-		System.out.print("\n\nStart ETsBrokerSolverMain");
-		
-		variables = ProblemQuantities.getInstance();
-		input = InputData.getInstance();
-		
-		if(step==0){
+		checkNull(variables, input);
+
+		if (step == 0) {
 			input.representativeTsModel = representativeTsModel;
 			variables.NUM_CONTROL_VOLUMES = input.z.length;
-			variables.totalDepth = input.z[variables.NUM_CONTROL_VOLUMES -1];
-			variables.StressedETs = new double [variables.NUM_CONTROL_VOLUMES -1];
-			variables.fluxRefs = new double [variables.NUM_CONTROL_VOLUMES -1];
-		
-			SplittedETsFactory representativeETsFactory= new SplittedETsFactory();
-			
-			computedTs = representativeETsFactory.createEvapoTranspirations(input.representativeTsModel);
-			
-			
-			outputToBuffer = new ArrayList<double[]>();
-			
-		}
-		
-		variables.zR = variables.totalDepth + input.etaR;
-		
-		if (input.representativeTsModel.equalsIgnoreCase("AverageWaterWeightedMethod")  && useWaterStress == false) {
-			System.out.print("\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");}
-		if (input.representativeTsModel.equalsIgnoreCase("SizeWaterWeightedMethod")  && useWaterStress == false) {
-			System.out.print("\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");}
-		if (input.representativeTsModel.equalsIgnoreCase("RootWaterWeightedMethod")  && useWaterStress == false) {
-			System.out.print("\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");}
-			
-		outputToBuffer.clear();
-		
-		variables.StressedETs = computedTs.computeStressedETs(input.GnT,input.transpiration,variables.zR);
+			variables.totalDepth = input.z[variables.NUM_CONTROL_VOLUMES - 1];
+			variables.StressedETs = new double[variables.NUM_CONTROL_VOLUMES - 1];
+			variables.fluxRefs = new double[variables.NUM_CONTROL_VOLUMES - 1];
 
-		StressedETs = variables.StressedETs;
+			computedTs = SplitETsFactory.createEvapoTranspirations(input.representativeTsModel, variables, input);
+
+			outputToBuffer = new ArrayList<double[]>();
+
+		}
+
+		variables.zR = variables.totalDepth + input.etaR;
+
+		if (input.representativeTsModel.equalsIgnoreCase("AverageWaterWeightedMethod") && useWaterStress == false) {
+			System.out.print(
+					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
+		}
+		if (input.representativeTsModel.equalsIgnoreCase("SizeWaterWeightedMethod") && useWaterStress == false) {
+			System.out.print(
+					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
+		}
+		if (input.representativeTsModel.equalsIgnoreCase("RootWaterWeightedMethod") && useWaterStress == false) {
+			System.out.print(
+					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
+		}
+
+		outputToBuffer.clear();
+
+		variables.StressedETs = computedTs.computeStressedETs(input.GnT, input.transpiration, variables.zR);
+
+		stressedETs = variables.StressedETs;
 		outputToBuffer.add(variables.StressedETs);
 		outputToBuffer.add(input.rootDensity);
 		outputToBuffer.add(variables.StressedETs);
 		outputToBuffer.add(variables.StressedETs);
-		
+
 		System.out.print("\nEnd ETsBrokerSolverMain");
-		
+
 		step++;
-		variables.step=step;
-		
+		variables.step = step;
+
 	}
 }

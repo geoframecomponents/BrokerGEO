@@ -24,72 +24,70 @@ import org.geoframe.brokergeo.data.InputData;
 import org.geoframe.brokergeo.data.ProblemQuantities;
 
 /**
- * Computation of the Transpiration from each control volumes as function of root distribution
+ * Computation of the Transpiration from each control volumes as function of
+ * root distribution
  * 
  * @author Concetta D'Amato
  */
+public class RootWaterWeightedMethod extends SplitETs {
 
-
-public class RootWaterWeightedMethod extends SplittedETs {
-
-	//private ProblemQuantities variables;
-	//private InputData input;
-	
-	/** General constructor used to pass the value of variables */
-	//public RootWaterWeightedMethod (double[] z, double[] deltaZ, int NUM_CONTROL_VOLUMES, double totalDepth) {
-		//super(z, deltaZ, NUM_CONTROL_VOLUMES, totalDepth);}
-
-
-	
-	public double [] computeStressedETs (double[] Gn,double fluxRef, double zRef) {
-		
-		//variables = ProblemQuantities.getInstance();
-		//input = InputData.getInstance();
-		variables.control=0;
-		variables.sumRootWaterStress=0;
-		
-		if (input.etaR == 0.0) {System.out.println("\n\nError: Please enter the root depth.\nSimulation ended");
-		System.exit(0);}
-		
-		//if(variables.step==0){
-		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES-2; i++) {
-			if (input.z[i]  >= zRef) {
-			//variables.sumRootDensity = variables.sumRootDensity + variables.rootDensity[i];
-			variables.sumRootWaterStress = variables.sumRootWaterStress + (input.rootDensity[i]*input.g[i]);}	
-		}
-		//}
-			
-		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES-2; i++) {
-			
-			if (Gn[0]== 0 ) {variables.fluxRefs[i] = 0;}
-			else {		
-				if (input.z[i] > zRef) {					
-					variables.fluxRefs[i]=(fluxRef*((input.rootDensity[i]*input.g[i])/variables.sumRootWaterStress));}
-				else{variables.fluxRefs[i] = 0;}}
-			variables.control = variables.control + variables.fluxRefs[i];
-			
-		}
-		
-		
-		
-		//if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Root corretto");}
-		
-		if((variables.control>=fluxRef - 1 * pow(10,-8))&&(variables.control<=fluxRef + 1 * pow(10,-8))) {
-		      System.out.println("\n\nControllo su fluxs Root corretto\"");
-		    }
-		    else {
-		      System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
-		      System.exit(0);
-		    }
-		
-		return variables.fluxRefs.clone();	
+	public RootWaterWeightedMethod(ProblemQuantities variables, InputData input) {
+		super(variables, input);
 	}
 
+	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
 
+		// variables = ProblemQuantities.getInstance();
+		// input = InputData.getInstance();
+		variables.control = 0;
+		variables.sumRootWaterStress = 0;
 
-	/*public double [] computeETs() {
-		return null;
-	}*/
+		if (input.etaR == 0.0) {
+			System.out.println("\n\nError: Please enter the root depth.\nSimulation ended");
+			System.exit(0);
+		}
+
+		// if(variables.step==0){
+		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
+			if (input.z[i] >= zRef) {
+				// variables.sumRootDensity = variables.sumRootDensity +
+				// variables.rootDensity[i];
+				variables.sumRootWaterStress = variables.sumRootWaterStress + (input.rootDensity[i] * input.g[i]);
+			}
+		}
+		// }
+
+		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
+
+			if (Gn[0] == 0) {
+				variables.fluxRefs[i] = 0;
+			} else {
+				if (input.z[i] > zRef) {
+					variables.fluxRefs[i] = (fluxRef
+							* ((input.rootDensity[i] * input.g[i]) / variables.sumRootWaterStress));
+				} else {
+					variables.fluxRefs[i] = 0;
+				}
+			}
+			variables.control = variables.control + variables.fluxRefs[i];
+
+		}
+
+		// if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef
+		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Root
+		// corretto");}
+
+		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
+			System.out.println("\n\nControllo su fluxs Root corretto\"");
+		} else {
+			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		}
+
+		return variables.fluxRefs.clone();
+	}
+
+	/*
+	 * public double [] computeETs() { return null; }
+	 */
 
 }
- 

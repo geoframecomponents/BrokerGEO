@@ -30,8 +30,12 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 	public void testTwoFluxes() throws Exception {
 
 		String pathGrid = getRes("/Input/Grid_NetCDF/GridLysRoot.nc");
-		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();
 		
+		InputData inputData = new InputData();
+		ProblemQuantities problemQuantities = new ProblemQuantities();
+		
+		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();
+
 		double evaporation = 10;
 		double transpiration = 65;
 		double[] g = {0.49853778058804915, 0.49853778058804915, 0.7751738855516915, 0.9332516598166297, 0.8542127726841605, 1.0, 1.0, 1.0, 1.0, 1.0};
@@ -39,8 +43,11 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 		double[] GnE = {0.9453297897565602,8};
 		double [] rootDensity= {0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0};
 		
-		ETsBrokerTwoFluxesSolverMain ETsBrokerSolver = new ETsBrokerTwoFluxesSolverMain();  
+		ETsBrokerTwoFluxesSolverMain etsBrokerSolver = new ETsBrokerTwoFluxesSolverMain();
+		etsBrokerSolver.input = inputData;
+		etsBrokerSolver.variables = problemQuantities;
 		InputDataMain Input = new InputDataMain();
+		Input.input = inputData;
 		
 		readNetCDF.richardsGridFilename = pathGrid;
 		
@@ -52,17 +59,21 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 		Input.deltaZ = readNetCDF.spaceDelta;
 		Input.transpiration = transpiration;
 		Input.evaporation = evaporation;
-		ETsBrokerSolver.representativeEsModel = "AverageWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod
-		ETsBrokerSolver.representativeTsModel = "RootWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod, RootWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
+		etsBrokerSolver.representativeEsModel = "AverageWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod
+		etsBrokerSolver.representativeTsModel = "RootWeightedMethod"; //SizeWaterWeightedMethod, AverageWaterWeightedMethod, RootWaterWeightedMethod //AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
 		Input.rootDensity = rootDensity;
-		ETsBrokerSolver.useWaterStress = false; //false, when you use simple methods
+		etsBrokerSolver.useWaterStress = false; //false, when you use simple methods
 		Input.g = g;
 		
 		Input.GnT = GnT;
 		Input.GnE = GnE;
 
 		Input.process();
-		ETsBrokerSolver.solve();
+		etsBrokerSolver.solve();
+
+		assertGoldenArray("StressedETs", etsBrokerSolver.StressedETs);
+		assertGoldenArray("transpirations", etsBrokerSolver.transpirations);
+		assertGoldenArray("evaporations", etsBrokerSolver.evaporations);
 	}
 }
 

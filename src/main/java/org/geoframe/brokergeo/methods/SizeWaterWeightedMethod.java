@@ -24,59 +24,56 @@ import org.geoframe.brokergeo.data.InputData;
 import org.geoframe.brokergeo.data.ProblemQuantities;
 
 /**
- * Computation of the Transpirations and Evapotranspirations by using stress factor size wighted metohd 
+ * Computation of the Transpirations and Evapotranspirations by using stress
+ * factor size wighted metohd
+ * 
  * @author Concetta D'Amato
  */
-public class SizeWaterWeightedMethod extends SplittedETs {
+public class SizeWaterWeightedMethod extends SplitETs {
 
-	//private ProblemQuantities variables;
-	//private InputData input;
-	/** General constructor used to pass the value of variables */
-	//public SizeWaterWeightedMethod (double[] z, double[] deltaZ, int NUM_CONTROL_VOLUMES, double totalDepth) {
-		//super(z, deltaZ, NUM_CONTROL_VOLUMES, totalDepth);}
+	public SizeWaterWeightedMethod(ProblemQuantities variables, InputData input) {
+		super(variables, input);
+	}
 
+	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
 
-	
-	public double [] computeStressedETs (double[] Gn,double fluxRef, double zRef) {
-		
-		//variables = ProblemQuantities.getInstance();
-		//input = InputData.getInstance();
-		variables.control=0;
+		// variables = ProblemQuantities.getInstance();
+		// input = InputData.getInstance();
+		variables.control = 0;
 		variables.etaRef = 0;
-		variables.etaRef = Math.floor((variables.totalDepth - zRef)*100)/100;
-		
-		
-		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES-2; i++) {
-			
-			if (Gn[0]== 0 ) {variables.fluxRefs[i] = 0;}
-			if (variables.etaRef== 0 ) {variables.fluxRefs[i] = 0;}
-			
-			else {		
-				if (input.z[i] >= zRef) {					
-					variables.fluxRefs[i]=((fluxRef*(input.g[i]* input.deltaZ[i]))/(variables.etaRef))/Gn[0];} 
-				else{variables.fluxRefs[i] = 0;}}
-			
+		variables.etaRef = Math.floor((variables.totalDepth - zRef) * 100) / 100;
+
+		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
+
+			if (Gn[0] == 0) {
+				variables.fluxRefs[i] = 0;
+			}
+			if (variables.etaRef == 0) {
+				variables.fluxRefs[i] = 0;
+			}
+
+			else {
+				if (input.z[i] >= zRef) {
+					variables.fluxRefs[i] = ((fluxRef * (input.g[i] * input.deltaZ[i])) / (variables.etaRef)) / Gn[0];
+				} else {
+					variables.fluxRefs[i] = 0;
+				}
+			}
+
 			variables.control = variables.control + variables.fluxRefs[i];
 		}
-		//if (variables.control == fluxRef) { System.out.println("\n\nControllo su fluxs Size corretto");}
-		//if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Size corretto");}
-		if((variables.control>=fluxRef - 1 * pow(10,-8))&&(variables.control<=fluxRef + 1 * pow(10,-8))) {
-		      System.out.println("\n\nControllo su fluxs Size corretto\"");
-		    }
-		    else {
-		    	System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
-			      System.exit(0);
-		    }
-		
-		return variables.fluxRefs.clone();	
+		// if (variables.control == fluxRef) { System.out.println("\n\nControllo su
+		// fluxs Size corretto");}
+		// if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef
+		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Size
+		// corretto");}
+		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
+			System.out.println("\n\nControllo su fluxs Size corretto\"");
+		} else {
+			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		}
+
+		return variables.fluxRefs.clone();
 	}
-	
-	
-	
-	
-	
-	/*public double [] computeETs() {
-		return null;
-	}*/
 
 }

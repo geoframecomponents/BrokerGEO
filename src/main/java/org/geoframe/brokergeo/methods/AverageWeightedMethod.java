@@ -17,70 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.geoframe.brokergeo.methods;
+
 import static java.lang.Math.pow;
 
 import org.geoframe.brokergeo.data.*;
 
-
-
 /**
- * Computation of Transpirations and Evapotranspirations from control volumes by using stress factor avarage method
+ * Computation of Transpirations and Evapotranspirations from control volumes by
+ * using stress factor avarage method
  * 
  * @author Concetta D'Amato
  */
 
-public class AverageWeightedMethod extends SplittedETs{
-	
-	//private ProblemQuantities variables;
-	//private InputData input;
+public class AverageWeightedMethod extends SplitETs {
 
-	/** General constructor used to pass the value of variables */
-	//public AverageETs (double[] z, double[] deltaZ, int NUM_CONTROL_VOLUMES, double totalDepth) {
-	//	super(z,deltaZ, NUM_CONTROL_VOLUMES, totalDepth);
-		
-	
-	//}
-	/*public double [] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
-		return null;
-	}*/
-	
-	
-	public double [] computeStressedETs (double[] Gn, double fluxRef, double zRef) {
-		
-		//variables = ProblemQuantities.getInstance();
-		//input = InputData.getInstance();
-		variables.control=0;
-		variables.N = 0; 
-		
-		//if (input.etaRef == 0.0) {variables.zRef = 0;}
-			//variables.N = variables.NUM_CONTROL_VOLUMES-2;} // NON SONO SICURA SU QUESTO CICLO IF 
-			//else
-		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES-2; i++) {
-		if (input.z[i] > zRef) {variables.N = variables.N  + 1;}}
-		
-		
-		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES-2; i++) {
+	public AverageWeightedMethod(ProblemQuantities variables, InputData input) {
+		super(variables, input);
+	}
 
-			if (input.z[i] >= zRef){
-					variables.fluxRefs[i]= fluxRef/variables.N;}
-				else {variables.fluxRefs[i] = 0;}
-			
+	public double[] computeStressedETs(double[] Gn, double fluxRef, double zRef) {
+
+		// variables = ProblemQuantities.getInstance();
+		// input = InputData.getInstance();
+		variables.control = 0;
+		variables.N = 0;
+
+		// if (input.etaRef == 0.0) {variables.zRef = 0;}
+		// variables.N = variables.NUM_CONTROL_VOLUMES-2;} // NON SONO SICURA SU QUESTO
+		// CICLO IF
+		// else
+		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
+			if (input.z[i] > zRef) {
+				variables.N = variables.N + 1;
+			}
+		}
+
+		for (int i = 0; i <= variables.NUM_CONTROL_VOLUMES - 2; i++) {
+
+			if (input.z[i] >= zRef) {
+				variables.fluxRefs[i] = fluxRef / variables.N;
+			} else {
+				variables.fluxRefs[i] = 0;
+			}
 
 			variables.control = variables.control + variables.fluxRefs[i];
-			}	
-		
-		
-		//if (variables.control == fluxRef) { System.out.println("\n\nControllo su fluxs Average corretto");}
-		
-		//if (variables.control < fluxRef + 1 * pow(10,-8) || variables.control > fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Average corretto");}
-		if((variables.control>=fluxRef - 1 * pow(10,-8))&&(variables.control<=fluxRef + 1 * pow(10,-8))) {
-		      System.out.println("\n\nControllo su fluxs Average corretto\"");
-		    }
-		    else {
-		      System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
-		      System.exit(0);
-		    }
-		
-		return variables.fluxRefs.clone();			
+		}
+
+		// if (variables.control == fluxRef) { System.out.println("\n\nControllo su
+		// fluxs Average corretto");}
+
+		// if (variables.control < fluxRef + 1 * pow(10,-8) || variables.control >
+		// fluxRef - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs
+		// Average corretto");}
+		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
+			System.out.println("\n\nControllo su fluxs Average corretto\"");
+		} else {
+			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		}
+
+		return variables.fluxRefs.clone();
 	}
 }

@@ -17,11 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.geoframe.brokergeo;
+
 import org.geoframe.brokergeo.solver.*;
 import org.geoframe.brokergeo.data.*;
 import org.hortonmachine.gears.io.geoframe.ReadNetCDFRichardsLysimeterGrid1D;
+
 /**
  * Test the Broker module.
+ * 
  * @author Concetta D'Amato
  */
 
@@ -32,21 +35,30 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 		String pathGrid = getRes("/Input/Grid_NetCDF/GridLysRoot.nc");
 		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();
 
+		InputData inputData = new InputData();
+		ProblemQuantities problemQuantities = new ProblemQuantities();
+
 		double transpiration = 65;
-		double[] g = {0.49853778058804915, 0.49853778058804915, 0.7751738855516915, 0.9332516598166297, 0.8542127726841605, 1.0, 1.0, 1.0, 1.0, 1.0};
-		double[] GnT = {0.9453297897565602,8};
+		double[] g = { 0.49853778058804915, 0.49853778058804915, 0.7751738855516915, 0.9332516598166297,
+				0.8542127726841605, 1.0, 1.0, 1.0, 1.0, 1.0 };
+		double[] GnT = { 0.9453297897565602, 8 };
 		double etaR = -0.8;
-		double [] rootDensity= {0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0};
-		
-		
-		ETsBrokerOneFluxSolverMain ETsBrokerSolver = new ETsBrokerOneFluxSolverMain();  
+		double[] rootDensity = { 0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0 };
+
+		ETsBrokerOneFluxSolverMain etsBrokerSolver = new ETsBrokerOneFluxSolverMain();
+		etsBrokerSolver.input = inputData;
+		etsBrokerSolver.variables = problemQuantities;
+
 		InputDataMain Input = new InputDataMain();
-		
+		Input.input = inputData;
+
 		readNetCDF.richardsGridFilename = pathGrid;
-		
+
 		readNetCDF.read();
-		ETsBrokerSolver.representativeTsModel = "AverageWeightedMethod"; //AverageWaterWeightedMethod, SizeWaterWeightedMetod, RootWaterWeightedMethod
-																//AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
+		etsBrokerSolver.representativeTsModel = "AverageWeightedMethod"; // AverageWaterWeightedMethod,
+																			// SizeWaterWeightedMetod,
+																			// RootWaterWeightedMethod
+		// AverageWeightedMethod, SizeWeightedMetod, RootWeightedMethod
 
 		Input.z = readNetCDF.z;
 		Input.etaR = etaR;
@@ -55,16 +67,13 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 		Input.rootDensity = rootDensity;
 		Input.g = g;
 		Input.GnT = GnT;
-		
-		ETsBrokerSolver.useWaterStress = false;//false, when you use simple methods
-		
 
-		
-		
+		etsBrokerSolver.useWaterStress = false;// false, when you use simple methods
+
 		Input.process();
-		
-		ETsBrokerSolver.solve();
-		
-		}
-}
 
+		etsBrokerSolver.solve();
+
+		assertGoldenArray("StressedETs", etsBrokerSolver.stressedETs);
+	}
+}

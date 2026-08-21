@@ -6,16 +6,6 @@ import oms3.annotations.Unit;
 
 public class InputData {
 	
-	private static InputData uniqueInstance;
-
-	public static InputData getInstance() {
-		if (uniqueInstance == null) {
-			uniqueInstance = new InputData();
-		}
-		return uniqueInstance;
-	}
-	
-	
 	@Description("Depth of the root.")
 	@Unit("m")
 	public double etaR;
