@@ -34,7 +34,7 @@ public class BuildBrokerGEOOneFluxFixture {
 		parameters.put(BrokerGeoInputsHandler.PARAM_GNT_G, 0.9453297897565602);
 		parameters.put(BrokerGeoInputsHandler.PARAM_GNT_N, 8.0);
 
-		GpkgFixtureBuilder.build(outPath, parameters, z, deltaZ, rootDensity, g, null);
+		GpkgFixtureBuilder.build(outPath, parameters, z, deltaZ, rootDensity, g);
 		System.out.println("Wrote " + outPath);
 	}
 }

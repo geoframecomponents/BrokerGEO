@@ -11,14 +11,7 @@ import org.hortonmachine.dbs.compat.IHMPreparedStatement;
 import org.hortonmachine.dbs.utils.SqlName;
 
 /**
- * DB-based output handler for BrokerGEO test results, modeled on
- * {@code org.geoframe.geoet.io.GeoetOutputsHandler} /
- * {@code Whetgeo1DOutputsHandler}. Unlike those two, BrokerGEO's solvers are
- * per-instant functions (called once per timestep by an upstream driver, no
- * time loop of their own), so this handler writes one snapshot - a row per
- * control volume - rather than buffering rows across steps: set the
- * per-control-volume arrays and call {@link #write()} once.
- *
+ * DB-based output handler for BrokerGEO test results.
  * <p>
  * Table name is prefixed {@value #PREFIX}, the same convention
  * {@code Whetgeo1DOutputsHandler}/{@code GeoetOutputsHandler} use.
@@ -46,7 +39,6 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	public static final String COL_Z = "z";
 	public static final String COL_ROOT_DENSITY = "rootDensity";
 	public static final String COL_G = "g";
-	public static final String COL_GE = "gE";
 	public static final String COL_STRESSED_ETS = "stressed_ets";
 	public static final String COL_TRANSPIRATION = "transpiration";
 	public static final String COL_EVAPORATION = "evaporation";
@@ -59,15 +51,16 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	public double[] evaporations;
 
 	/**
-	 * Optional per-cell input context (depth, root density, stress factors),
+	 * Optional per-cell input context (depth, root density, stress factor),
 	 * denormalized into the results table so the output gpkg alone can be
 	 * charted (e.g. stressedETs vs z, or vs rootDensity/g) without joining back
-	 * to the input fixture.
+	 * to the input fixture. {@code g} is the single stress array
+	 * {@code CurrentStepInput} has - shared between transpiration and
+	 * evaporation, see {@code BrokerGeoInputsHandler.g}'s javadoc.
 	 */
 	public double[] z;
 	public double[] rootDensity;
 	public double[] g;
-	public double[] gE;
 
 	/**
 	 * Input parameter snapshot, written once if non-null and non-empty. Values
@@ -115,7 +108,6 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 		boolean withZ = (z != null);
 		boolean withRootDensity = (rootDensity != null);
 		boolean withG = (g != null);
-		boolean withGE = (gE != null);
 		boolean withTranspiration = (transpirations != null);
 		boolean withEvaporation = (evaporations != null);
 
@@ -126,8 +118,6 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 			cols.add(COL_ROOT_DENSITY);
 		if (withG)
 			cols.add(COL_G);
-		if (withGE)
-			cols.add(COL_GE);
 		cols.add(COL_STRESSED_ETS);
 		if (withTranspiration)
 			cols.add(COL_TRANSPIRATION);
@@ -157,8 +147,6 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 						ps.setDouble(pos++, rootDensity[i]);
 					if (withG)
 						ps.setDouble(pos++, g[i]);
-					if (withGE)
-						ps.setDouble(pos++, gE[i]);
 					ps.setDouble(pos++, stressedETs[i]);
 					if (withTranspiration)
 						ps.setDouble(pos++, transpirations[i]);

@@ -23,7 +23,6 @@ public class BuildBrokerGEOTwoFluxesFixture {
 		double[] rootDensity = { 0.3, 0.4, 0.6, 0.7, 0.8, 1.0, 1.0, 1.0, 1.0, 1.0 };
 		double[] g = { 0.49853778058804915, 0.49853778058804915, 0.7751738855516915, 0.9332516598166297,
 				0.8542127726841605, 1.0, 1.0, 1.0, 1.0, 1.0 };
-		double[] gE = g; // TestBrokerGEOTwoFluxes reuses the same g array for both GnT and GnE
 
 		Map<String, Object> parameters = new LinkedHashMap<>();
 		parameters.put(BrokerGeoInputsHandler.PARAM_ETA_R, -0.8);
@@ -38,7 +37,7 @@ public class BuildBrokerGEOTwoFluxesFixture {
 		parameters.put(BrokerGeoInputsHandler.PARAM_GNE_G, 0.9453297897565602);
 		parameters.put(BrokerGeoInputsHandler.PARAM_GNE_N, 8.0);
 
-		GpkgFixtureBuilder.build(outPath, parameters, z, deltaZ, rootDensity, g, gE);
+		GpkgFixtureBuilder.build(outPath, parameters, z, deltaZ, rootDensity, g);
 		System.out.println("Wrote " + outPath);
 	}
 }

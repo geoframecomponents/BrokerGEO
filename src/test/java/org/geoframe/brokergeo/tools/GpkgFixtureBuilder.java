@@ -26,18 +26,18 @@ public class GpkgFixtureBuilder {
 	 *                       {@link Integer} or a {@link Number} (stored as REAL)
 	 * @param z              per-cell depth, one row per entry in the
 	 *                       {@code grid} table (may be one longer than
-	 *                       {@code rootDensity}/{@code g}/{@code gE} - the
-	 *                       trailing row(s) just leave those columns NULL)
+	 *                       {@code rootDensity}/{@code g} - the trailing row(s)
+	 *                       just leave those columns NULL)
 	 * @param deltaZ         per-cell control-volume length, same length as
 	 *                       {@code z}
 	 * @param rootDensity    per-cell root density, or {@code null} if unused
-	 * @param g              per-cell transpiration water-stress factor, or
-	 *                       {@code null} if unused
-	 * @param gE             per-cell evaporation water-stress factor, or
-	 *                       {@code null} if unused (two-flux scenarios only)
+	 * @param g              per-cell water-stress factor, or {@code null} if
+	 *                       unused - shared between transpiration and
+	 *                       evaporation splits, see
+	 *                       {@code BrokerGeoInputsHandler.g}'s javadoc
 	 */
 	public static void build(String outputGpkgPath, Map<String, Object> parameters, double[] z, double[] deltaZ,
-			double[] rootDensity, double[] g, double[] gE) throws Exception {
+			double[] rootDensity, double[] g) throws Exception {
 		java.io.File out = new java.io.File(outputGpkgPath);
 		if (out.exists()) {
 			out.delete();
@@ -46,7 +46,7 @@ public class GpkgFixtureBuilder {
 		try (ADb db = EDb.GEOPACKAGE.getDb()) {
 			db.open(outputGpkgPath);
 			writeParameters(db, parameters);
-			writeGrid(db, z, deltaZ, rootDensity, g, gE);
+			writeGrid(db, z, deltaZ, rootDensity, g);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class GpkgFixtureBuilder {
 		});
 	}
 
-	private static void writeGrid(ADb db, double[] z, double[] deltaZ, double[] rootDensity, double[] g, double[] gE)
+	private static void writeGrid(ADb db, double[] z, double[] deltaZ, double[] rootDensity, double[] g)
 			throws Exception {
 		SqlName table = SqlName.m(BrokerGeoInputsHandler.TABLE_GRID);
 
@@ -98,8 +98,6 @@ public class GpkgFixtureBuilder {
 			cols.add(BrokerGeoInputsHandler.COL_ROOT_DENSITY);
 		if (g != null)
 			cols.add(BrokerGeoInputsHandler.COL_G);
-		if (gE != null)
-			cols.add(BrokerGeoInputsHandler.COL_GE);
 
 		List<String> fieldDefs = new ArrayList<>();
 		fieldDefs.add(BrokerGeoInputsHandler.COL_ID + " INTEGER PRIMARY KEY");
@@ -124,8 +122,6 @@ public class GpkgFixtureBuilder {
 						setNullableDouble(ps, pos++, rootDensity, i);
 					if (g != null)
 						setNullableDouble(ps, pos++, g, i);
-					if (gE != null)
-						setNullableDouble(ps, pos++, gE, i);
 					ps.addBatch();
 				}
 				ps.executeBatch();

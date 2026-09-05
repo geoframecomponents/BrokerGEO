@@ -81,8 +81,8 @@ public class TestBrokerGEOTwoFluxesGpkg extends BrokerGeoTestCase {
 				outputsHandler.evaporations = etsBrokerSolver.evaporations;
 				outputsHandler.z = Arrays.copyOf(inputsHandler.z, outputsHandler.stressedETs.length);
 				outputsHandler.rootDensity = inputsHandler.rootDensity;
+				// shared with the transpiration split - see BrokerGeoInputsHandler.g's javadoc
 				outputsHandler.g = inputsHandler.g;
-				outputsHandler.gE = inputsHandler.gE;
 				outputsHandler.parameters = inputsHandler.getParameters();
 				outputsHandler.write();
 			}
