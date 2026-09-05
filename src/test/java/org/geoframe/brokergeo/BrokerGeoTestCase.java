@@ -1,5 +1,6 @@
 package org.geoframe.brokergeo;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -18,14 +19,15 @@ public abstract class BrokerGeoTestCase extends TestCase {
 		return Paths.get(url.toURI()).toString();
 	}
 
+	protected String getTmpPath(String prefix, String ext) throws Exception {
+		File tempFile = Files.createTempFile(prefix, ext).toFile();
+		return tempFile.getAbsolutePath();
+	}
+
 	/**
 	 * Compares {@code actual} against a frozen baseline checked in at
 	 * src/test/resources/golden/&lt;this test's simple class name&gt;/&lt;arrayName&gt;.csv
-	 * (one value per line). This freezes today's (pre-refactor) computed values so a
-	 * later refactor of the solver/methods classes can be checked against them.
-	 * <p>
-	 * To (re)capture the baseline after an intentional behavior change, delete the
-	 * golden file and write the new actual values in its place, one per line.
+	 * (one value per line). 
 	 */
 	protected void assertGoldenArray( String arrayName, double[] actual ) throws IOException, URISyntaxException {
 		String className = this.getClass().getSimpleName();
