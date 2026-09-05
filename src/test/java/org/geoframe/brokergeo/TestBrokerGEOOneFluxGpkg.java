@@ -19,6 +19,8 @@
 package org.geoframe.brokergeo;
 
 import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
+import java.util.Arrays;
+
 import org.geoframe.brokergeo.core.state.CurrentStepInput;
 import org.geoframe.brokergeo.core.state.ProblemQuantities;
 import org.geoframe.brokergeo.io.BrokerGeoInputsHandler;
@@ -67,6 +69,9 @@ public class TestBrokerGEOOneFluxGpkg extends BrokerGeoTestCase {
 
 			try (BrokerGeoOutputsHandler outputsHandler = new BrokerGeoOutputsHandler(outputGpkg)) {
 				outputsHandler.stressedETs = etsBrokerSolver.stressedETs;
+				outputsHandler.z = Arrays.copyOf(inputsHandler.z, outputsHandler.stressedETs.length);
+				outputsHandler.rootDensity = inputsHandler.rootDensity;
+				outputsHandler.g = inputsHandler.g;
 				outputsHandler.parameters = inputsHandler.getParameters();
 				outputsHandler.write();
 			}

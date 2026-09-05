@@ -18,6 +18,8 @@
  */
 package org.geoframe.brokergeo;
 
+import java.util.Arrays;
+
 import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
 import org.geoframe.brokergeo.core.state.CurrentStepInput;
 import org.geoframe.brokergeo.core.state.ProblemQuantities;
@@ -77,6 +79,10 @@ public class TestBrokerGEOTwoFluxesGpkg extends BrokerGeoTestCase {
 				outputsHandler.stressedETs = etsBrokerSolver.StressedETs;
 				outputsHandler.transpirations = etsBrokerSolver.transpirations;
 				outputsHandler.evaporations = etsBrokerSolver.evaporations;
+				outputsHandler.z = Arrays.copyOf(inputsHandler.z, outputsHandler.stressedETs.length);
+				outputsHandler.rootDensity = inputsHandler.rootDensity;
+				outputsHandler.g = inputsHandler.g;
+				outputsHandler.gE = inputsHandler.gE;
 				outputsHandler.parameters = inputsHandler.getParameters();
 				outputsHandler.write();
 			}

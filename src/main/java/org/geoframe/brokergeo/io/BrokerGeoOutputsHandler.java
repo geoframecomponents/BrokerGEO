@@ -43,6 +43,10 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	public static final String TABLE_OUTPUT_PARAMETERS = PREFIX + "_output_parameters";
 
 	public static final String COL_ID = "id";
+	public static final String COL_Z = "z";
+	public static final String COL_ROOT_DENSITY = "rootDensity";
+	public static final String COL_G = "g";
+	public static final String COL_GE = "gE";
 	public static final String COL_STRESSED_ETS = "stressed_ets";
 	public static final String COL_TRANSPIRATION = "transpiration";
 	public static final String COL_EVAPORATION = "evaporation";
@@ -53,6 +57,17 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	public double[] transpirations;
 	/** Optional: only {@code ETsBrokerTwoFluxesSolverMain} produces this. */
 	public double[] evaporations;
+
+	/**
+	 * Optional per-cell input context (depth, root density, stress factors),
+	 * denormalized into the results table so the output gpkg alone can be
+	 * charted (e.g. stressedETs vs z, or vs rootDensity/g) without joining back
+	 * to the input fixture.
+	 */
+	public double[] z;
+	public double[] rootDensity;
+	public double[] g;
+	public double[] gE;
 
 	/**
 	 * Input parameter snapshot, written once if non-null and non-empty. Values
@@ -97,10 +112,23 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	}
 
 	private void writeResults() throws Exception {
+		boolean withZ = (z != null);
+		boolean withRootDensity = (rootDensity != null);
+		boolean withG = (g != null);
+		boolean withGE = (gE != null);
 		boolean withTranspiration = (transpirations != null);
 		boolean withEvaporation = (evaporations != null);
 
-		List<String> cols = new ArrayList<>(List.of(COL_ID, COL_STRESSED_ETS));
+		List<String> cols = new ArrayList<>(List.of(COL_ID));
+		if (withZ)
+			cols.add(COL_Z);
+		if (withRootDensity)
+			cols.add(COL_ROOT_DENSITY);
+		if (withG)
+			cols.add(COL_G);
+		if (withGE)
+			cols.add(COL_GE);
+		cols.add(COL_STRESSED_ETS);
 		if (withTranspiration)
 			cols.add(COL_TRANSPIRATION);
 		if (withEvaporation)
@@ -123,6 +151,14 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 				for (int i = 0; i < stressedETs.length; i++) {
 					int pos = 1;
 					ps.setInt(pos++, i);
+					if (withZ)
+						ps.setDouble(pos++, z[i]);
+					if (withRootDensity)
+						ps.setDouble(pos++, rootDensity[i]);
+					if (withG)
+						ps.setDouble(pos++, g[i]);
+					if (withGE)
+						ps.setDouble(pos++, gE[i]);
 					ps.setDouble(pos++, stressedETs[i]);
 					if (withTranspiration)
 						ps.setDouble(pos++, transpirations[i]);
