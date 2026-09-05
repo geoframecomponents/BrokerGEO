@@ -32,8 +32,8 @@ public class TestBrokerGEOTwoFluxes extends BrokerGeoTestCase {
 
 		String pathGrid = getRes("/Input/Grid_NetCDF/GridLysRoot.nc");
 		
-		CurrentStepInput inputData = new CurrentStepInput();
-		ProblemQuantities problemQuantities = new ProblemQuantities();
+		BGCurrentStepInput inputData = new BGCurrentStepInput();
+		BGProblemQuantities problemQuantities = new BGProblemQuantities();
 		
 		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();
 

@@ -20,8 +20,8 @@ package org.geoframe.brokergeo.core.fluxsplit;
 
 import static java.lang.Math.pow;
 
-import org.geoframe.brokergeo.core.state.CurrentStepInput;
-import org.geoframe.brokergeo.core.state.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.BGCurrentStepInput;
+import org.geoframe.brokergeo.core.state.BGProblemQuantities;
 
 /**
  * Computation of the Transpirations and Evapotranspirations by using stress
@@ -31,7 +31,7 @@ import org.geoframe.brokergeo.core.state.ProblemQuantities;
  */
 public class SizeWaterWeightedMethod extends SplitETs {
 
-	public double[] computeStressedETs(ProblemQuantities variables, CurrentStepInput input, double[] Gn,
+	public double[] computeStressedETs(BGProblemQuantities variables, BGCurrentStepInput input, double[] Gn,
 			double fluxRef, double zRef) {
 
 		// variables = ProblemQuantities.getInstance();

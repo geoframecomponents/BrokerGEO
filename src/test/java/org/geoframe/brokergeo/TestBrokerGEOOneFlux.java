@@ -36,8 +36,8 @@ public class TestBrokerGEOOneFlux extends BrokerGeoTestCase {
 		String pathGrid = getRes("/Input/Grid_NetCDF/GridLysRoot.nc");
 		ReadNetCDFRichardsLysimeterGrid1D readNetCDF = new ReadNetCDFRichardsLysimeterGrid1D();
 
-		CurrentStepInput inputData = new CurrentStepInput();
-		ProblemQuantities problemQuantities = new ProblemQuantities();
+		BGCurrentStepInput inputData = new BGCurrentStepInput();
+		BGProblemQuantities problemQuantities = new BGProblemQuantities();
 
 		double transpiration = 65;
 		double[] g = { 0.49853778058804915, 0.49853778058804915, 0.7751738855516915, 0.9332516598166297,

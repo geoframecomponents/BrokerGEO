@@ -21,8 +21,8 @@ package org.geoframe.brokergeo;
 import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
 import java.util.Arrays;
 
-import org.geoframe.brokergeo.core.state.CurrentStepInput;
-import org.geoframe.brokergeo.core.state.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.BGCurrentStepInput;
+import org.geoframe.brokergeo.core.state.BGProblemQuantities;
 import org.geoframe.brokergeo.io.BrokerGeoInputsHandler;
 import org.geoframe.brokergeo.io.BrokerGeoOutputsHandler;
 import org.geoframe.brokergeo.solvers.ETsBrokerOneFluxSolverMain;
@@ -42,8 +42,8 @@ public class TestBrokerGEOOneFluxGpkg extends BrokerGeoTestCase {
 		String inputGpkg = getRes("/Input/gpkg/BrokerGEOOneFlux.gpkg");
 		String outputGpkg = getTmpPath("BrokerGEOOneFluxOutput", ".gpkg");
 
-		CurrentStepInput inputData = new CurrentStepInput();
-		ProblemQuantities problemQuantities = new ProblemQuantities();
+		BGCurrentStepInput inputData = new BGCurrentStepInput();
+		BGProblemQuantities problemQuantities = new BGProblemQuantities();
 
 		ETsBrokerOneFluxSolverMain etsBrokerSolver = new ETsBrokerOneFluxSolverMain();
 		etsBrokerSolver.input = inputData;

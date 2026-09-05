@@ -3,7 +3,7 @@ package org.geoframe.brokergeo.core.state;
 import oms3.annotations.Description;
 import oms3.annotations.Unit;
 
-public class ProblemQuantities {
+public class BGProblemQuantities {
 
 	@Description("Sum of Initial Condition for root density")
 	@Unit("-")

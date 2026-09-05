@@ -77,8 +77,8 @@ public class ETsBrokerTwoFluxesSolverMain extends HMModel {
 	@Description("Object dealing with evaporation from each control volume of the domain")
 	private SplitETs computedEs;
 
-	public ProblemQuantities variables;
-	public CurrentStepInput input;
+	public BGProblemQuantities variables;
+	public BGCurrentStepInput input;
 
 	@Execute
 	public void solve() {

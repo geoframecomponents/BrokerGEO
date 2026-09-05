@@ -18,8 +18,8 @@
  */
 package org.geoframe.brokergeo.core.fluxsplit;
 
-import org.geoframe.brokergeo.core.state.CurrentStepInput;
-import org.geoframe.brokergeo.core.state.ProblemQuantities;
+import org.geoframe.brokergeo.core.state.BGCurrentStepInput;
+import org.geoframe.brokergeo.core.state.BGProblemQuantities;
 
 /**
  * The stressedETs abstract class.
@@ -38,7 +38,7 @@ public abstract class SplitETs {
 	 *
 	 * @return fluxRefs
 	 */
-	public abstract double[] computeStressedETs(ProblemQuantities variables, CurrentStepInput input, double[] Gn,
+	public abstract double[] computeStressedETs(BGProblemQuantities variables, BGCurrentStepInput input, double[] Gn,
 			double fluxRef, double zRef);
 
 }

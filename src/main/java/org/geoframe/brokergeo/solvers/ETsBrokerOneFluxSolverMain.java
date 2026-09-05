@@ -60,8 +60,8 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 	@Description("Object dealing with transpiration from each control volume of the domain")
 	SplitETs computedTs;
 
-	public ProblemQuantities variables;
-	public CurrentStepInput input;
+	public BGProblemQuantities variables;
+	public BGCurrentStepInput input;
 
 	@Execute
 	public void solve() {

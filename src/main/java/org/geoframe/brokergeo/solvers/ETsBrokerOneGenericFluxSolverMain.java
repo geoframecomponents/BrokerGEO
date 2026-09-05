@@ -58,8 +58,8 @@ public class ETsBrokerOneGenericFluxSolverMain extends HMModel {
 
 	@Description("Object dealing with a generic flux from each control volume of the domain")
 	private SplitETs computedFluxs;
-	public ProblemQuantities variables;
-	public CurrentStepInput input;
+	public BGProblemQuantities variables;
+	public BGCurrentStepInput input;
 
 	@Execute
 	public void solve() {

@@ -6,7 +6,7 @@ import oms3.annotations.Unit;
 
 import org.geoframe.brokergeo.core.fluxsplit.FluxSplitMethod;
 
-public class CurrentStepInput {
+public class BGCurrentStepInput {
 	
 	@Description("Depth of the root.")
 	@Unit("m")
