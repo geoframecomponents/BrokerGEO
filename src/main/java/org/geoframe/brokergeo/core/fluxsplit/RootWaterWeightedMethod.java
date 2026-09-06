@@ -74,10 +74,8 @@ public class RootWaterWeightedMethod extends SplitETs {
 		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Root
 		// corretto");}
 
-		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
-			System.out.println("\n\nControllo su fluxs Root corretto\"");
-		} else {
-			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		if ((variables.control < fluxRef - 1 * pow(10, -8)) || (variables.control > fluxRef + 1 * pow(10, -8))) {
+			throw new RuntimeException("RootWaterWeightedMethod: ERROR in splitting ET.");
 		}
 
 		return variables.fluxRefs.clone();

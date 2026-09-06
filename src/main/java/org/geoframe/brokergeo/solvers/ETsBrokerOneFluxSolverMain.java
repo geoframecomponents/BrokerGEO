@@ -83,8 +83,8 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 		variables.zR = variables.totalDepth + input.etaR;
 
 		if (input.representativeTsModel.isWaterWeighted() && !useWaterStress) {
-			System.out.print(
-					"\nWARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
+			pm.errorMessage(
+					"WARNING: the flux is splitted according the water stress factor, but evapotranspiration is not water stressed");
 		}
 
 		outputToBuffer.clear();
@@ -97,8 +97,6 @@ public class ETsBrokerOneFluxSolverMain extends HMModel {
 		outputToBuffer.add(input.rootDensity);
 		outputToBuffer.add(variables.StressedETs);
 		outputToBuffer.add(variables.StressedETs);
-
-		System.out.print("\nEnd ETsBrokerSolverMain");
 
 		step++;
 		variables.step = step;

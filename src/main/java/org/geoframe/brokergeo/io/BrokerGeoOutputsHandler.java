@@ -9,6 +9,7 @@ import org.hortonmachine.dbs.compat.ADb;
 import org.hortonmachine.dbs.compat.EDb;
 import org.hortonmachine.dbs.compat.IHMPreparedStatement;
 import org.hortonmachine.dbs.utils.SqlName;
+import org.hortonmachine.gears.io.geoframe.whetgeo.Whetgeo1DOutputSchema;
 
 /**
  * DB-based output handler for BrokerGEO test results.
@@ -21,11 +22,29 @@ import org.hortonmachine.dbs.utils.SqlName;
  * optional: leaving either {@code null} omits its column - {@code
  * ETsBrokerOneFluxSolverMain} only produces {@link #stressedETs}, while
  * {@code ETsBrokerTwoFluxesSolverMain} produces all three.
+ *
+ * <p>
+ * This class has two independent write modes, coexisting side by side:
+ * <ul>
+ * <li>the original one-shot mode above ({@link #write()} into {@link
+ * #TABLE_OUTPUT_RESULTS}) - BrokerGEO's own solvers are per-instant snapshot
+ * calculators with no time-looping concept, so a native BrokerGEO test calls
+ * {@code solve()} and {@link #write()} exactly once (see {@code
+ * TestBrokerGEOOneFluxGpkg}/{@code TestBrokerGEOTwoFluxesGpkg});
+ * <li>a buffered, per-timestep mode ({@link #writeStep()} into {@link
+ * #TABLE_OUTPUT_UPTAKE}, timestamp x eta long format matching WHETGEO-1D's
+ * own {@code output_state} join-key convention) for a caller that itself
+ * loops over time and calls this solver once per step - e.g. GEOSPACE-1D's
+ * coupled stack, where {@code stressedETs} genuinely is BrokerGEO's own
+ * output even though the time-loop driving it lives in another project.
+ * </ul>
  */
 public class BrokerGeoOutputsHandler implements AutoCloseable {
 
 	public static final String PREFIX = "geoframe_brokergeo";
 	public static final String TABLE_OUTPUT_RESULTS = PREFIX + "_output_results";
+	/** Buffered, per-timestep counterpart to {@link #TABLE_OUTPUT_RESULTS} - see {@link #writeStep()}. */
+	public static final String TABLE_OUTPUT_UPTAKE = PREFIX + "_output_uptake";
 	/**
 	 * Optional table, one row, written once: a snapshot of the input parameters
 	 * this run was configured with - see {@code BrokerGeoInputsHandler.getParameters()}.
@@ -70,7 +89,20 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 	 */
 	public Map<String, Object> parameters;
 
+	// --- timestepped mode (see writeStep()) ---
+	/** Set once before the first {@link #writeStep()}: the real cells' eta coordinates. */
+	public double[] eta;
+	/** Set before each {@link #writeStep()} call. */
+	public long timestamp;
+
 	private final ADb db;
+	private final boolean ownsDb;
+	private final int bufferSize;
+
+	private boolean stepInitialized = false;
+	private String sqlInsertStep;
+	private final List<Long> stepTsBuf = new ArrayList<>();
+	private final List<double[]> stepUptakeBuf = new ArrayList<>();
 
 	public BrokerGeoOutputsHandler(String dbPath) throws Exception {
 		// each test run produces a fresh output gpkg; a stale file from a previous
@@ -81,6 +113,21 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 		}
 		this.db = EDb.GEOPACKAGE.getDb();
 		this.db.open(dbPath);
+		this.ownsDb = true;
+		this.bufferSize = 0;
+	}
+
+	/**
+	 * Timestepped mode: shares an already-open {@link ADb} (not closed by this
+	 * instance, and not deleted/recreated - other writers may already hold it
+	 * open, see {@code GeospaceOutputsHandler} in GEOSPACE-1D for the same
+	 * reasoning) and buffers {@link #writeStep()} calls, flushing every {@code
+	 * bufferSize} steps.
+	 */
+	public BrokerGeoOutputsHandler(ADb db, int bufferSize) {
+		this.db = db;
+		this.ownsDb = false;
+		this.bufferSize = bufferSize;
 	}
 
 	/** Writes the current snapshot (and the parameter snapshot, if set). Call once. */
@@ -89,9 +136,28 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 		writeParametersIfPresent();
 	}
 
+	/**
+	 * Accumulates the current step ({@link #timestamp}, {@link #stressedETs})
+	 * into {@link #TABLE_OUTPUT_UPTAKE}, flushing to the DB every {@code
+	 * bufferSize} steps - see the class javadoc's timestepped-mode description.
+	 */
+	public void writeStep() throws Exception {
+		if (!stepInitialized) {
+			initializeStep();
+		}
+		stepTsBuf.add(timestamp);
+		stepUptakeBuf.add(stressedETs.clone());
+		if (stepTsBuf.size() >= bufferSize) {
+			flushStep();
+		}
+	}
+
 	@Override
 	public void close() throws Exception {
-		db.close();
+		flushStep();
+		if (ownsDb) {
+			db.close();
+		}
 	}
 
 	private static String placeholders(int n) {
@@ -198,5 +264,51 @@ public class BrokerGeoOutputsHandler implements AutoCloseable {
 			}
 			return null;
 		});
+	}
+
+	private void initializeStep() throws Exception {
+		SqlName uptakeTable = SqlName.m(TABLE_OUTPUT_UPTAKE);
+		if (!db.hasTable(uptakeTable)) {
+			db.createTable(uptakeTable, COL_ID + " INTEGER PRIMARY KEY", Whetgeo1DOutputSchema.COL_TIMESTAMP + " INTEGER",
+					Whetgeo1DOutputSchema.COL_ETA + " REAL", COL_STRESSED_ETS + " REAL");
+			db.createIndex(uptakeTable, Whetgeo1DOutputSchema.COL_TIMESTAMP, false);
+			db.createIndex(uptakeTable, Whetgeo1DOutputSchema.COL_ETA, false);
+		}
+		sqlInsertStep = String.format("""
+				INSERT INTO %s (%s, %s, %s)
+				VALUES (?, ?, ?)
+				""", TABLE_OUTPUT_UPTAKE, Whetgeo1DOutputSchema.COL_TIMESTAMP, Whetgeo1DOutputSchema.COL_ETA,
+				COL_STRESSED_ETS);
+		stepInitialized = true;
+	}
+
+	private void flushStep() throws Exception {
+		if (stepTsBuf.isEmpty()) {
+			return;
+		}
+		int n = stepTsBuf.size();
+		int kmax = eta.length;
+		db.execOnConnection(conn -> {
+			boolean autoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
+			try (IHMPreparedStatement ps = conn.prepareStatement(sqlInsertStep)) {
+				for (int r = 0; r < n; r++) {
+					long ts = stepTsBuf.get(r);
+					double[] uptake = stepUptakeBuf.get(r);
+					for (int k = 0; k < kmax; k++) {
+						ps.setLong(1, ts);
+						ps.setDouble(2, eta[k]);
+						ps.setDouble(3, uptake[k]);
+						ps.addBatch();
+					}
+				}
+				ps.executeBatch();
+				conn.commit();
+				conn.setAutoCommit(autoCommit);
+			}
+			return null;
+		});
+		stepTsBuf.clear();
+		stepUptakeBuf.clear();
 	}
 }
