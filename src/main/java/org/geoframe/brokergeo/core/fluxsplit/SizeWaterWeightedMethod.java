@@ -64,10 +64,8 @@ public class SizeWaterWeightedMethod extends SplitETs {
 		// if (variables.control<fluxRef + 1 * pow(10,-8) || variables.control > fluxRef
 		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Size
 		// corretto");}
-		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
-			System.out.println("\n\nControllo su fluxs Size corretto\"");
-		} else {
-			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		if ((variables.control < fluxRef - 1 * pow(10, -8)) || (variables.control > fluxRef + 1 * pow(10, -8))) {
+			throw new RuntimeException("SizeWaterWeightedMethod: ERROR in splitting ET.");
 		}
 
 		return variables.fluxRefs.clone();

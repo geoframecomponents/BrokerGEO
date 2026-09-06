@@ -59,10 +59,8 @@ public class AverageWaterWeightedMethod extends SplitETs {
 		// - 1 * pow(10,-8)) { System.out.println("\n\nControllo su fluxs Average
 		// corretto");}
 
-		if ((variables.control >= fluxRef - 1 * pow(10, -8)) && (variables.control <= fluxRef + 1 * pow(10, -8))) {
-			System.out.println("\n\nControllo su fluxs Average corretto\"");
-		} else {
-			System.out.println("\n\nERROR in splitting ET.\nSimulation ended");
+		if ((variables.control < fluxRef - 1 * pow(10, -8)) || (variables.control > fluxRef + 1 * pow(10, -8))) {
+			throw new RuntimeException("AverageWaterWeightedMethod: ERROR in splitting ET.");
 		}
 
 		return variables.fluxRefs.clone();
